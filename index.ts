@@ -9,6 +9,7 @@ const CHANNEL_REGEX = /^UC[a-zA-Z0-9-_]{22,32}$/;
 const YT_HOSTS = ['www.youtube.com', 'youtube.com', 'music.youtube.com'];
 
 // Import requirements
+import axios from 'axios';
 import { resolve } from 'path';
 import { request } from 'undici';
 import { encode } from 'querystring';
@@ -19,21 +20,21 @@ import UTILS from './lib/Utils';
 import PARSE_ITEM from './lib/ParseItem';
 
 // Import types
-import { YtplOptions } from '.';
+import { YtplOptions, YtplResult } from '.';
 
 class YTPL {
 	/**
 	 * Searches for a YouTube playlist by query.
 	 *
 	 * @param {string} query - The playlist URL or ID.
-	 * @param {YtplOptions} options - The options for the request.
+	 * @param {YtplOptions} [options={}] - The options for the request.
 	 * @param {number} [rt=3] - The number of retry attempts.
 	 *
 	 * @returns {Promise<any>} The parsed playlist data.
 	 */
 	public async search(
 		query: string,
-		options: YtplOptions,
+		options: YtplOptions = {},
 		rt: number = 3
 	): Promise<any> {
 		const listId = await this.getPlaylistId(query);
@@ -157,6 +158,59 @@ class YTPL {
 	}
 
 	/**
+	 * Performs an enhanced search for YouTube playlists based on the given query.
+	 *
+	 * @param {string} query - The search query for finding YouTube playlists.
+	 * @param {YtplOptions} [options={}] - Optional search parameters to customize the request.
+	 * @param {number} [rt=3] - Number of retry attempts in case of failures.
+	 *
+	 * @returns {Promise<any>} Resolves with the search results.
+	 */
+	public async enhancedSearch(
+		query: string,
+		options: YtplOptions = {},
+		rt: number = 3
+	): Promise<any> {
+		const q = encodeURIComponent(query);
+		const url = `https://www.youtube.com/results?search_query=${q}&sp=EgIQAw%253D%253D`;
+
+		try {
+			const response = await axios({
+				url,
+				method: 'GET',
+
+				headers: {
+					'User-Agent':
+						'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+				},
+			});
+
+			if (!response.data) {
+				return [];
+			}
+
+			const regex = /"playlistId":"([^"]+)"/g;
+			const matches = [...response.data.matchAll(regex)];
+			const ids = matches.map(match => match[1]);
+			const filteredIds = [...new Set(ids)].slice(0, options?.limit ?? 10);
+
+			const playlists: YtplResult[] = [];
+
+			for (const playlistId of filteredIds) {
+				const playlist = await this.search(playlistId, options, rt);
+
+				if (playlist) {
+					playlists.push(playlist);
+				}
+			}
+
+			return playlists;
+		} catch (e) {
+			throw new Error(`Unable to find playlists with name '${query}'!`);
+		}
+	}
+
+	/**
 	 * Parses additional playlist pages.
 	 *
 	 * @param {string} apiKey - The YouTube API key.
@@ -206,7 +260,6 @@ class YTPL {
 
 		if (!nextToken || opts.limit < 1) return parsedItems;
 
-		// Recursively fetch more items
 		const nestedResp = await this.parsePage2(apiKey, nextToken, context, opts);
 		parsedItems.push(...nestedResp);
 
@@ -272,6 +325,7 @@ class YTPL {
 		} else if (maybeType === 'c') {
 			return await this.toChannelList(`https://www.youtube.com/c/${maybeId}`);
 		}
+
 		throw new Error(`Unable to find a id in "${query}"`);
 	}
 

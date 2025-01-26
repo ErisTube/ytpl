@@ -15,14 +15,37 @@ npm install @eristube/ytpl
 ```js
 const ytpl = require('@eristube/ytpl');
 
-const playlist = await ytpl(
+/**
+ * RECOMMENDED
+ * Search playlists by name
+ */
+const playlists = await ytpl.enhancedSearch('NCS Music');
+
+// Search playlist by id
+const playlist = await ytpl.search(
 	'https://www.youtube.com/watch?v=OBPLM84zm34&list=PLCihw_MkvN1TDLc6cH3xaSCZXIPCUTg6I'
 );
 ```
 
 # API
 
-### ytpl(id, [options])
+### ytpl.enhancedSearch(name, [options])
+
+Attempts to resolve the given playlist name
+
+- `name`
+  - name of the yt-playlist
+- `options`
+
+  - object with options
+  - possible settings:
+  - gl[String] -> 2-Digit Code of a Country, defaults to `US` - Allows for localisation of the request
+  - hl[String] -> 2-Digit Code for a Language, defaults to `en` - Allows for localisation of the request
+  - utcOffsetMinutes[Number] -> Offset in minutes from UTC, defaults to `-300` - Allows for localisation of the request
+  - limit[Number] -> limits the pulled items, defaults to 10, set to Infinity to get the whole playlist - numbers <1 result in the default being used
+  - requestOptions[Object] -> All additional parameters will get passed to undici's [request options](https://github.com/nodejs/undici#undicirequesturl-options-promise), which is used to do the https requests
+
+### ytpl.search(id, [options])
 
 Attempts to resolve the given playlist id
 
