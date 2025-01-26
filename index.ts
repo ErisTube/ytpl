@@ -164,13 +164,13 @@ class YTPL {
 	 * @param {YtplOptions} [options={}] - Optional search parameters to customize the request.
 	 * @param {number} [rt=3] - Number of retry attempts in case of failures.
 	 *
-	 * @returns {Promise<any>} Resolves with the search results.
+	 * @returns {Promise<any[]>} Resolves with the search results.
 	 */
 	public async enhancedSearch(
 		query: string,
 		options: YtplOptions = {},
 		rt: number = 3
-	): Promise<any> {
+	): Promise<any[]> {
 		const q = encodeURIComponent(query);
 		const url = `https://www.youtube.com/results?search_query=${q}&sp=EgIQAw%253D%253D`;
 
