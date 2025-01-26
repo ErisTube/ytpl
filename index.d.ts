@@ -107,11 +107,11 @@ declare class YTPL {
 	 *
 	 * @returns Resolves with the search results.
 	 */
-	public async enhancedSearch(
+	public enhancedSearch(
 		query: string,
 		options?: YtplOptions,
 		rt?: number
-	): Promise<YtplResult>;
+	): Promise<YtplResult[]>;
 
 	/**
 	 * Parses additional playlist pages.
