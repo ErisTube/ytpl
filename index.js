@@ -11,6 +11,7 @@ const ALBUM_REGEX = /^OLAK5uy_[a-zA-Z0-9-_]{33}$/;
 const CHANNEL_REGEX = /^UC[a-zA-Z0-9-_]{22,32}$/;
 const YT_HOSTS = ['www.youtube.com', 'youtube.com', 'music.youtube.com'];
 // Import requirements
+const axios_1 = __importDefault(require("axios"));
 const path_1 = require("path");
 const undici_1 = require("undici");
 const querystring_1 = require("querystring");
@@ -23,12 +24,12 @@ class YTPL {
      * Searches for a YouTube playlist by query.
      *
      * @param {string} query - The playlist URL or ID.
-     * @param {YtplOptions} options - The options for the request.
+     * @param {YtplOptions} [options={}] - The options for the request.
      * @param {number} [rt=3] - The number of retry attempts.
      *
      * @returns {Promise<any>} The parsed playlist data.
      */
-    async search(query, options, rt = 3) {
+    async search(query, options = {}, rt = 3) {
         const listId = await this.getPlaylistId(query);
         const opts = Utils_1.default.checkArgs(listId, options);
         const ref = BASE_PLIST_URL + (0, querystring_1.encode)(opts.query);
@@ -108,6 +109,46 @@ class YTPL {
         }
     }
     /**
+     * Performs an enhanced search for YouTube playlists based on the given query.
+     *
+     * @param {string} query - The search query for finding YouTube playlists.
+     * @param {YtplOptions} [options={}] - Optional search parameters to customize the request.
+     * @param {number} [rt=3] - Number of retry attempts in case of failures.
+     *
+     * @returns {Promise<any>} Resolves with the search results.
+     */
+    async enhancedSearch(query, options = {}, rt = 3) {
+        const q = encodeURIComponent(query);
+        const url = `https://www.youtube.com/results?search_query=${q}&sp=EgIQAw%253D%253D`;
+        try {
+            const response = await (0, axios_1.default)({
+                url,
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                },
+            });
+            if (!response.data) {
+                return [];
+            }
+            const regex = /"playlistId":"([^"]+)"/g;
+            const matches = [...response.data.matchAll(regex)];
+            const ids = matches.map(match => match[1]);
+            const filteredIds = [...new Set(ids)].slice(0, options?.limit ?? 10);
+            const playlists = [];
+            for (const playlistId of filteredIds) {
+                const playlist = await this.search(playlistId, options, rt);
+                if (playlist) {
+                    playlists.push(playlist);
+                }
+            }
+            return playlists;
+        }
+        catch (e) {
+            throw new Error(`Unable to find playlists with name '${query}'!`);
+        }
+    }
+    /**
      * Parses additional playlist pages.
      *
      * @param {string} apiKey - The YouTube API key.
@@ -139,7 +180,6 @@ class YTPL {
                     .continuationCommand.token;
         if (!nextToken || opts.limit < 1)
             return parsedItems;
-        // Recursively fetch more items
         const nestedResp = await this.parsePage2(apiKey, nextToken, context, opts);
         parsedItems.push(...nestedResp);
         return parsedItems;

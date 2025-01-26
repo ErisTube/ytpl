@@ -1,6 +1,6 @@
 {
 	"name": "@eristube/ytpl",
-	"version": "1.0.0-dev.1737922076",
+	"version": "1.0.0-dev.1737927784",
 	"description": "A lightweight and simple YouTube playlist resolver for ErisTube. ",
 	"main": "index.js",
 	"scripts": {
@@ -38,6 +38,7 @@
 	},
 	"homepage": "https://github.com/ErisTube/ytpl#readme",
 	"dependencies": {
+		"axios": "^1.7.9",
 		"undici": "five"
 	},
 	"devDependencies": {

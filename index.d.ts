@@ -99,6 +99,21 @@ declare class YTPL {
 	): Promise<YtplResult>;
 
 	/**
+	 * Performs an enhanced search for YouTube playlists based on the given query.
+	 *
+	 * @param query - The search query for finding YouTube playlists.
+	 * @param options - Optional search parameters to customize the request.
+	 * @param rt - Number of retry attempts in case of failures.
+	 *
+	 * @returns Resolves with the search results.
+	 */
+	public async enhancedSearch(
+		query: string,
+		options?: YtplOptions,
+		rt?: number
+	): Promise<YtplResult>;
+
+	/**
 	 * Parses additional playlist pages.
 	 *
 	 * @param apiKey - The YouTube API key.
