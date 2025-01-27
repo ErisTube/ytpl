@@ -1,6 +1,6 @@
 {
 	"name": "@eristube/ytpl",
-	"version": "1.0.0-dev.1737937978",
+	"version": "1.0.0-dev.1737940888",
 	"description": "A lightweight and simple YouTube playlist resolver for ErisTube. ",
 	"main": "index.js",
 	"scripts": {
