@@ -22,7 +22,7 @@ export interface ParsedItem {
 
 	thumbnail: string;
 	isLive: boolean;
-	duration: string | null;
+	duration: string;
 }
 
 export interface PlaylistItemRenderer {
@@ -55,31 +55,16 @@ export interface YtplResult {
 	id: string;
 	url: string;
 	title: string;
-	visibility: 'link only' | 'everyone';
-	description: string | null;
-	total_items: number;
-	views: string;
-	last_updated: string;
-	author: null | {
-		id: string;
-		name: string;
-		avatar: string;
-		user: string | null;
-		channel_url: string;
-		user_url: string | null;
-	};
-	items: {
-		id: string;
-		url: string;
-		url_simple: string;
-		title: string;
-		thumbnail: string;
-		duration: string | null;
-		author: null | {
-			name: string;
-			ref: string;
-		};
-	}[];
+	totalItems: number;
+	thumbnail: YtplResultThumbnail;
+	views: number;
+	items: ParsedItem[];
+}
+
+export interface YtplResultThumbnail {
+	url: string;
+	width: number;
+	height: number;
 }
 
 declare class YTPL {

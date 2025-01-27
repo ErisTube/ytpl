@@ -91,12 +91,12 @@ class YTPL {
 				info.thumbnailRenderer.playlistCustomThumbnailRenderer
 			).thumbnail.thumbnails.sort((a, b) => b.width - a.width)[0];
 
-			const resp = {
+			const resp: YtplResult = {
 				id: listId,
 				thumbnail,
 				url: `${BASE_PLIST_URL}list=${listId}`,
 				title: UTILS.parseText(info.title),
-				total_items: UTILS.parseNumFromText(info.stats[0]),
+				totalItems: UTILS.parseNumFromText(info.stats[0]),
 				views:
 					info.stats.length === 3 ? UTILS.parseNumFromText(info.stats[1]) : 0,
 				items: [],
