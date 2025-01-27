@@ -53,7 +53,7 @@ class YTPL {
 
 				if (!browseId) browseId = `VL${listId}`;
 				if (!parsed.apiKey || !parsed.context.client.clientVersion)
-					throw new Error('Missing api key');
+					throw new Error('Missing api key!');
 
 				parsed.json = await UTILS.doPost(BASE_API_URL + parsed.apiKey, opts, {
 					context: parsed.context,
@@ -62,12 +62,12 @@ class YTPL {
 			} catch (e) {}
 		}
 
-		if (!parsed.json.sidebar) throw new Error('Unknown Playlist');
+		if (!parsed.json.sidebar) throw new Error('Unknown Playlist!');
 
 		if (!parsed.json) {
 			if (rt === 0) {
 				this.logger(body);
-				throw new Error('Unsupported playlist');
+				throw new Error('Unsupported playlist!');
 			}
 
 			return await this.search(query, opts, rt - 1);
@@ -107,21 +107,19 @@ class YTPL {
 					x => Object.keys(x)[0] === 'itemSectionRenderer'
 				);
 
-			if (!itemSectionRenderer) throw Error('Empty playlist');
+			if (!itemSectionRenderer) throw Error('Empty playlist!');
 
 			const playlistVideoListRenderer =
 				itemSectionRenderer.itemSectionRenderer.contents.find(
 					x => Object.keys(x)[0] === 'playlistVideoListRenderer'
 				);
 
-			if (!playlistVideoListRenderer) throw Error('Empty playlist');
+			if (!playlistVideoListRenderer) throw Error('Empty playlist!');
 
 			const rawVideoList =
 				playlistVideoListRenderer.playlistVideoListRenderer.contents;
-			resp.items = rawVideoList
-				.map(PARSE_ITEM)
-				.filter(a => a)
-				.filter((_, index) => index < opts.limit);
+			resp.items = rawVideoList.map(PARSE_ITEM).filter(a => a);
+			// .filter((_, index) => index < opts.limit);
 
 			opts.limit -= resp.items.length;
 
@@ -241,10 +239,8 @@ class YTPL {
 			json.onResponseReceivedActions[0].appendContinuationItemsAction
 				.continuationItems;
 
-		const parsedItems = wrapper
-			.map(PARSE_ITEM)
-			.filter(a => a)
-			.filter((_, index) => index < opts.limit);
+		const parsedItems = wrapper.map(PARSE_ITEM).filter(a => a);
+		// .filter((_, index) => index < opts.limit);
 
 		opts.limit -= parsedItems.length;
 
@@ -275,7 +271,7 @@ class YTPL {
 	 */
 	public async getPlaylistId(query: string): Promise<string> {
 		if (typeof query !== 'string' || !query) {
-			throw new Error('The query has to be a string');
+			throw new Error('The query has to be a string!');
 		}
 
 		if (PLAYLIST_REGEX.test(query) || ALBUM_REGEX.test(query)) {
@@ -289,7 +285,7 @@ class YTPL {
 		const parsed = new URL(query, BASE_PLIST_URL);
 
 		if (!YT_HOSTS.includes(parsed.host))
-			throw new Error('not a known youtube link');
+			throw new Error('Not a known youtube link!');
 
 		if (parsed.searchParams.has('list')) {
 			const listParam = parsed.searchParams.get('list');
@@ -299,16 +295,16 @@ class YTPL {
 			}
 
 			if (listParam && listParam.startsWith('RD')) {
-				throw new Error('Mixes not supported');
+				throw new Error('Mixes not supported!');
 			}
 
-			throw new Error('invalid or unknown list query in url');
+			throw new Error('Invalid or unknown list query in url!');
 		}
 
 		const p = parsed.pathname.substring(1).split('/');
 
 		if (p.length < 2 || p.some(a => !a)) {
-			throw new Error(`Unable to find a id in "${query}"`);
+			throw new Error(`Unable to find a id in "${query}"!`);
 		}
 
 		const maybeType = p[p.length - 2];
@@ -326,7 +322,7 @@ class YTPL {
 			return await this.toChannelList(`https://www.youtube.com/c/${maybeId}`);
 		}
 
-		throw new Error(`Unable to find a id in "${query}"`);
+		throw new Error(`Unable to find a id in "${query}"!`);
 	}
 
 	/**
@@ -397,7 +393,7 @@ class YTPL {
 		const channelMatch = body.match(CHANNEL_ONPAGE_REGEXP);
 
 		if (channelMatch) return `UU${channelMatch[1]}`;
-		throw new Error(`Unable to resolve the ref: ${ref}`);
+		throw new Error(`Unable to resolve the ref: ${ref}!`);
 	}
 
 	/**
