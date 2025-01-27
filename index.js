@@ -72,7 +72,7 @@ class YTPL {
                 thumbnail,
                 url: `${BASE_PLIST_URL}list=${listId}`,
                 title: Utils_1.default.parseText(info.title),
-                total_items: Utils_1.default.parseNumFromText(info.stats[0]),
+                totalItems: Utils_1.default.parseNumFromText(info.stats[0]),
                 views: info.stats.length === 3 ? Utils_1.default.parseNumFromText(info.stats[1]) : 0,
                 items: [],
             };
