@@ -1,14 +1,11 @@
 {
 	"name": "@eristube/ytpl",
-	"version": "1.0.0-dev.1737940888",
+	"version": "1.0.0-dev.1738229426",
 	"description": "A lightweight and simple YouTube playlist resolver for ErisTube. ",
 	"main": "index.js",
 	"scripts": {
 		"build": "tsc -p tsconfig.json",
-		"build:del": "rimraf dist && tsc -p tsconfig.json",
-		"build:docs": "docgen -s src/*.ts src/**/*.ts -o docs/index.json -c docs/index.yml -g -S 1 -j .jsconfig.json",
-		"pub": "npm publish",
-		"pub:dev": "npm publish --tag dev"
+		"build:del": "rimraf dist && tsc -p tsconfig.json"
 	},
 	"repository": {
 		"type": "git",
@@ -20,16 +17,12 @@
 		"music",
 		"discord",
 		"eris bot",
-		"discord bot",
-		"discord music",
-		"discord player",
-		"discord bot on eris",
-		"discord player music",
 		"eristube",
 		"youtube",
 		"youtube api",
 		"playlists",
-		"youtube playlists"
+		"youtube playlists",
+		"discord bot"
 	],
 	"author": "ErisTube Inc.",
 	"license": "Apache-2.0",
@@ -41,13 +34,16 @@
 		"axios": "^1.7.9",
 		"undici": "five"
 	},
+	"peerDependencies": {
+		"eristube": "github:ErisTube/main#build"
+	},
 	"devDependencies": {
 		"@types/node": "^22.10.5",
 		"rimraf": "^6.0.1",
 		"typescript": "^5.7.3"
 	},
 	"engines": {
-		"node": ">=18.20.6"
+		"node": ">=20.18.2"
 	},
 	"types": "./index.d.ts"
 }

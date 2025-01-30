@@ -20,7 +20,7 @@ import UTILS from './lib/Utils';
 import PARSE_ITEM from './lib/ParseItem';
 
 // Import types
-import { YtplOptions, YtplResult } from '.';
+import { ParsedItem, YtplOptions, YtplResult } from '.';
 
 class YTPL {
 	/**
@@ -30,13 +30,13 @@ class YTPL {
 	 * @param {YtplOptions} [options={}] - The options for the request.
 	 * @param {number} [rt=3] - The number of retry attempts.
 	 *
-	 * @returns {Promise<any>} The parsed playlist data.
+	 * @returns {Promise<YtplResult>} The parsed playlist data.
 	 */
 	public async search(
 		query: string,
 		options: YtplOptions = {},
 		rt: number = 3
-	): Promise<any> {
+	): Promise<YtplResult> {
 		const listId = await this.getPlaylistId(query);
 		const opts = UTILS.checkArgs(listId, options);
 
@@ -136,7 +136,7 @@ class YTPL {
 
 			if (!token || opts.limit < 1) return resp;
 
-			const nestedResp = await this.parsePage2(
+			const nestedResp = await this.parsePage(
 				parsed.apiKey,
 				token,
 				parsed.context,
@@ -162,13 +162,13 @@ class YTPL {
 	 * @param {YtplOptions} [options={}] - Optional search parameters to customize the request.
 	 * @param {number} [rt=3] - Number of retry attempts in case of failures.
 	 *
-	 * @returns {Promise<any[]>} Resolves with the search results.
+	 * @returns {Promise<YtplResult[]>} Resolves with the search results.
 	 */
 	public async enhancedSearch(
 		query: string,
 		options: YtplOptions = {},
 		rt: number = 3
-	): Promise<any[]> {
+	): Promise<YtplResult[]> {
 		const q = encodeURIComponent(query);
 		const url = `https://www.youtube.com/results?search_query=${q}&sp=EgIQAw%253D%253D`;
 
@@ -216,14 +216,14 @@ class YTPL {
 	 * @param {any} context - The request context.
 	 * @param {any} opts - The options for the request.
 	 *
-	 * @returns {Promise<any>} The parsed video list.
+	 * @returns {Promise<ParsedItem[]>} The parsed video list.
 	 */
-	public async parsePage2(
+	public async parsePage(
 		apiKey: string,
 		token: string,
 		context: any,
 		opts: any
-	): Promise<any> {
+	): Promise<ParsedItem[]> {
 		const json = await UTILS.doPost(
 			BASE_API_URL + apiKey,
 			opts.requestOptions,
@@ -256,7 +256,7 @@ class YTPL {
 
 		if (!nextToken || opts.limit < 1) return parsedItems;
 
-		const nestedResp = await this.parsePage2(apiKey, nextToken, context, opts);
+		const nestedResp = await this.parsePage(apiKey, nextToken, context, opts);
 		parsedItems.push(...nestedResp);
 
 		return parsedItems;
