@@ -27,7 +27,7 @@ class YTPL {
      * @param {YtplOptions} [options={}] - The options for the request.
      * @param {number} [rt=3] - The number of retry attempts.
      *
-     * @returns {Promise<any>} The parsed playlist data.
+     * @returns {Promise<YtplResult>} The parsed playlist data.
      */
     async search(query, options = {}, rt = 3) {
         const listId = await this.getPlaylistId(query);
@@ -94,7 +94,7 @@ class YTPL {
                         .continuationCommand.token;
             if (!token || opts.limit < 1)
                 return resp;
-            const nestedResp = await this.parsePage2(parsed.apiKey, token, parsed.context, opts);
+            const nestedResp = await this.parsePage(parsed.apiKey, token, parsed.context, opts);
             resp.items.push(...nestedResp);
             return resp;
         }
@@ -113,7 +113,7 @@ class YTPL {
      * @param {YtplOptions} [options={}] - Optional search parameters to customize the request.
      * @param {number} [rt=3] - Number of retry attempts in case of failures.
      *
-     * @returns {Promise<any[]>} Resolves with the search results.
+     * @returns {Promise<YtplResult[]>} Resolves with the search results.
      */
     async enhancedSearch(query, options = {}, rt = 3) {
         const q = encodeURIComponent(query);
@@ -154,9 +154,9 @@ class YTPL {
      * @param {any} context - The request context.
      * @param {any} opts - The options for the request.
      *
-     * @returns {Promise<any>} The parsed video list.
+     * @returns {Promise<ParsedItem[]>} The parsed video list.
      */
-    async parsePage2(apiKey, token, context, opts) {
+    async parsePage(apiKey, token, context, opts) {
         const json = await Utils_1.default.doPost(BASE_API_URL + apiKey, opts.requestOptions, {
             context,
             continuation: token,
@@ -176,7 +176,7 @@ class YTPL {
                     .continuationCommand.token;
         if (!nextToken || opts.limit < 1)
             return parsedItems;
-        const nestedResp = await this.parsePage2(apiKey, nextToken, context, opts);
+        const nestedResp = await this.parsePage(apiKey, nextToken, context, opts);
         parsedItems.push(...nestedResp);
         return parsedItems;
     }

@@ -108,7 +108,7 @@ declare class YTPL {
 	 *
 	 * @returns The parsed video list.
 	 */
-	public parsePage2(
+	public parsePage(
 		apiKey: string,
 		token: string,
 		context: any,
